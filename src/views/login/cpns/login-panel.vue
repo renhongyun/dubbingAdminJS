@@ -21,78 +21,73 @@
     </el-form>
 
     <div class="login-btn">
-      <el-button
-        type="primary"
-        class="login-btn"
-        size="large"
-        @click="loginAction"
-      >
+      <el-button type="primary" class="login-btn" size="large" @click="loginAction">
         登录
       </el-button>
     </div>
   </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { ElMessage } from "element-plus";
-import { useLoginStore } from "@/stores/login";
-import Cookies from "js-cookie";
+import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { useLoginStore } from '@/store/login/login'
+import Cookies from 'js-cookie'
 
 const loginInfo = reactive({
-  name: "",
-  password: "",
-});
+  name: '',
+  password: ''
+})
 
-const rememberMe = ref(false);
+const rememberMe = ref(false)
 
 const loginRules = {
-  name: [{ required: true, message: "请输入帐号信息", trigger: "blur" }],
-  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
-};
+  name: [{ required: true, message: '请输入帐号信息', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+}
 
-const formRef = ref(null);
-const loginStore = useLoginStore();
-const router = useRouter();
+const formRef = ref(null)
+const loginStore = useLoginStore()
+const router = useRouter()
 
 const loginAction = () => {
   formRef.value?.validate(async (valid) => {
     if (valid) {
-      const userAccount = loginInfo.name;
-      const userPassword = loginInfo.password;
+      const userAccount = loginInfo.name
+      const userPassword = loginInfo.password
       try {
         const response = await loginStore.loginAccountAction({
           userAccount,
-          userPassword,
-        });
+          userPassword
+        })
         if (response && response.code === 0) {
-          ElMessage.success("登录成功");
+          ElMessage.success('登录成功')
           if (rememberMe.value) {
-            localStorage.setItem("loginInfo", JSON.stringify(loginInfo));
+            localStorage.setItem('loginInfo', JSON.stringify(loginInfo))
           } else {
-            localStorage.removeItem("loginInfo");
+            localStorage.removeItem('loginInfo')
           }
         } else {
-          ElMessage.error(response.message || "登录失败");
+          ElMessage.error(response.message || '登录失败')
         }
       } catch (error) {
-        ElMessage.error("登录失败");
+        ElMessage.error('登录失败')
       }
     } else {
-      ElMessage.error("登录失败");
+      ElMessage.error('登录失败')
     }
-  });
-};
+  })
+}
 
 onMounted(() => {
-  const savedLoginInfo = localStorage.getItem("loginInfo");
+  const savedLoginInfo = localStorage.getItem('loginInfo')
   if (savedLoginInfo) {
-    const parsedLoginInfo = JSON.parse(savedLoginInfo);
-    loginInfo.name = parsedLoginInfo.name;
-    loginInfo.password = parsedLoginInfo.password;
-    rememberMe.value = true;
+    const parsedLoginInfo = JSON.parse(savedLoginInfo)
+    loginInfo.name = parsedLoginInfo.name
+    loginInfo.password = parsedLoginInfo.password
+    rememberMe.value = true
   }
-});
+})
 </script>
 <style lang="less" scoped>
 .login-panel {
